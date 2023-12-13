@@ -1,5 +1,7 @@
 from llama_index import SimpleDirectoryReader, VectorStoreIndex
-
+import spacy
+nlp = spacy.load("en_core_web_md")
+from bs4 import BeautifulSoup
 from flask import jsonify
 from flask_cors import CORS
 from llama_index import ServiceContext
@@ -149,19 +151,27 @@ storage_context = StorageContext.from_defaults(vector_store=wms_vector_store)
 
 # Allow the creation of an Index
 
-def download_wikipedia_content(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        # Save the content to a file
-        with open(os.path.join(wikipedia_data_dir, 'wikipedia_content.txt'), 'w', encoding='utf-8') as file:
-            file.write(response.text)
 
+    
+
+            
+def get_wikipedia_text(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    paragraphs = soup.find_all('p')
+    text = ' '.join([paragraph.text for paragraph in paragraphs])
+    pinecone.Index('quickstart').upsert(items=[{"id": "wikipedia_document", "vector": document_vector}])
+    wms_vector_store = PineconeVectorStore(pinecone_index=pinecone_index, namespace="wikipedia_info")
+    storage_context = StorageContext.from_defaults(vector_store=wms_vector_store)
+
+    
 def load_data_into_vector_store():
     # Load data into PineconeVectorStore
     #documents = SimpleDirectoryReader(wikipedia_data_dir).load_data()
+    
     wms_vector_index = VectorStoreIndex.from_documents([],
                                        storage_context=storage_context)
-
+    
 def train_query_engine_with_data():
     # Train the query engine with loaded data
     query_engine = wms_vector_index.as_query_engine()
