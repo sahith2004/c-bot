@@ -12,5 +12,5 @@ gunicorn
 pinecone-client
 gradientai
 bs4
-spacy==3.2.0
+
 
