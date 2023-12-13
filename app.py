@@ -218,7 +218,7 @@ def download_wikipedia_content(url):
     
 def load_data_into_vector_store():
     # Load data into PineconeVectorStore
-    documents = SimpleDirectoryReader(wikipedia_data_dir).load_data()
+    #documents = SimpleDirectoryReader(wikipedia_data_dir).load_data()
     wms_vector_store = PineconeVectorStore(pinecone_index=pinecone_index, namespace="wikipedia_info")
     storage_context = StorageContext.from_defaults(vector_store=wms_vector_store)
 
