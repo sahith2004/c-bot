@@ -13,4 +13,4 @@ pinecone-client
 gradientai
 bs4
 spacy==3.2.0
-&& python -m spacy download en_core_web_md==3.2.0
+
