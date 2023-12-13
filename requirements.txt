@@ -12,5 +12,5 @@ gunicorn
 pinecone-client
 gradientai
 bs4
-
+gensim
 
