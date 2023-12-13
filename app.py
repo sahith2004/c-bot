@@ -1,7 +1,5 @@
 from llama_index import SimpleDirectoryReader, VectorStoreIndex
-import spacy
 
-from bs4 import BeautifulSoup
 from flask import jsonify
 from flask_cors import CORS
 from llama_index import ServiceContext
