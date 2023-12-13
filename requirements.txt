@@ -11,3 +11,5 @@ flask_cors
 gunicorn
 pinecone-client
 gradientai
+spacy
+bs4
