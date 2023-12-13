@@ -134,7 +134,7 @@ wms_vector_store = PineconeVectorStore(
 storage_context = StorageContext.from_defaults(vector_store=wms_vector_store)
 
 
-documents = SimpleDirectoryReader(wikipedia_data_dir).load_data()
+#documents = SimpleDirectoryReader(wikipedia_data_dir).load_data()
 # allow the creation of an Index
 wms_vector_index = VectorStoreIndex.from_documents([],
                                        storage_context=storage_context)
