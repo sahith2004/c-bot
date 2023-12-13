@@ -12,8 +12,20 @@ from llama_index import (
     SQLDatabase,
 
 )
+
+
 import os
 import pinecone
+# find API key in console at https://app.pinecone.io/
+os.environ['PINECONE_API_KEY'] = '69cce988-1524-4dd4-bcf1-8221a8b5a576'
+# environment is found next to API key in the console
+os.environ['PINECONE_ENVIRONMENT'] = 'gcp-starter'
+
+# initialize connection to pinecone
+pinecone.init(
+    api_key=os.environ['PINECONE_API_KEY'],
+    environment=os.environ['PINECONE_ENVIRONMENT']
+)
 pinecone_index = pinecone.Index('quickstart')
 from llama_index import VectorStoreIndex, SimpleDirectoryReader
 from llama_index.vector_stores import PineconeVectorStore
