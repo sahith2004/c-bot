@@ -13,6 +13,20 @@ from llama_index import (
 
 )
 
+import re
+import json
+import nltk
+import uuid
+import numpy as np
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from gensim.models import Word2Vec
+import pinecone
+
+# Download NLTK resources
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 import os
 import pinecone
@@ -76,13 +90,13 @@ llm = GradientBaseModelLLM(
     callback_manager=gradient_callback,
     is_chat_model=True,
 )
-folder_name = "data/wms"
+#folder_name = "data/wms"
 
 # Get the current directory
-current_directory = os.getcwd()
+#current_directory = os.getcwd()
 
 # Create a path for the new folder
-wikipedia_data_dir= folder_name
+#wikipedia_data_dir= folder_name
 
 from llama_index import set_global_service_context
 
@@ -149,8 +163,54 @@ storage_context = StorageContext.from_defaults(vector_store=wms_vector_store)
 
 # Allow the creation of an Index
 
+stop_words = set(stopwords.words('english'))
+stemmer = nltk.SnowballStemmer('english')
+lemmatizer = nltk.WordNetLemmatizer()
 
-    
+# Define function to clean text
+def clean_text(text):
+    # Lowercase text
+    text = text.lower()
+    # Remove non-alphabetic characters
+    text = re.sub('[^A-Za-z]+', ' ', text)
+    # Tokenize text
+    words = word_tokenize(text)
+    # Remove stopwords
+    words = [word for word in words if word not in stop_words]
+    # Rejoin words
+    cleaned_text = ' '.join(words)
+    return cleaned_text
+
+def preprocess_text(text):
+    # Tokenize the text into words
+    words = nltk.word_tokenize(text.lower())
+    # Remove stop words
+    words = [word for word in words if word not in stop_words]
+    # Stem and lemmatize the words
+    words = [stemmer.stem(lemmatizer.lemmatize(word, pos='v')) for word in words]
+    return words
+
+def generate_story_embeddings(text):
+    # Preprocess text
+    words = preprocess_text(text)
+    # Generate Word2Vec model
+    model = Word2Vec(sentences=[words], vector_size=1024, window=5, min_count=1, workers=4)
+    # Extract embeddings
+    embeddings = [model.wv[word] for word in words]
+    return np.vstack(embeddings)
+
+
+def download_wikipedia_content(url):
+    response = requests.get(url)
+    text = ""
+    if response.status_code == 200:
+        text = response.text
+    cleaned_text = clean_text(text)
+    embeddings = generate_story_embeddings(cleaned_text)
+    metadata = {'filename': str(uuid.uuid4()), 'category': 'hardcoded_category'}
+    vector_list = [{'id': str(uuid.uuid4()), 'values': vector.tolist(), 'metadata': metadata} for vector in embeddings]
+    pinecone_index.upsert(vector_list)
+
 
             
 
@@ -159,7 +219,9 @@ storage_context = StorageContext.from_defaults(vector_store=wms_vector_store)
 def load_data_into_vector_store():
     # Load data into PineconeVectorStore
     documents = SimpleDirectoryReader(wikipedia_data_dir).load_data()
-    
+    wms_vector_store = PineconeVectorStore(pinecone_index=pinecone_index, namespace="wikipedia_info")
+    storage_context = StorageContext.from_defaults(vector_store=wms_vector_store)
+
     wms_vector_index = VectorStoreIndex.from_documents([],
                                        storage_context=storage_context)
     
@@ -201,7 +263,7 @@ def train_query_engine():
     os.makedirs(wikipedia_data_dir, exist_ok=True)
     # Download Wikipedia content based on the provided URL
     download_wikipedia_content(wikipedia_url)
-    load_data_into_vector_store()
+    #load_data_into_vector_store()
     train_query_engine_with_data()
     # Return a response indicating that training is complete
     return jsonify({'status': 'Training complete'})
