@@ -260,10 +260,10 @@ def train_query_engine():
     wikipedia_url = request.form.get('wikipedia_url')
     print(wikipedia_url)
     # Create the directory if it doesn't exist
-    os.makedirs(wikipedia_data_dir, exist_ok=True)
+    #os.makedirs(wikipedia_data_dir, exist_ok=True)
     # Download Wikipedia content based on the provided URL
     download_wikipedia_content(wikipedia_url)
-    #load_data_into_vector_store()
+    load_data_into_vector_store()
     train_query_engine_with_data()
     # Return a response indicating that training is complete
     return jsonify({'status': 'Training complete'})
