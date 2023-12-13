@@ -82,7 +82,7 @@ llm = GradientBaseModelLLM(
 #current_directory = os.getcwd()
 
 # Create a path for the new folder
-wikipedia_data_dir= folder_name
+#wikipedia_data_dir= folder_name
 
 from llama_index import set_global_service_context
 
@@ -158,8 +158,8 @@ def download_wikipedia_content(url):
 
 def load_data_into_vector_store():
     # Load data into PineconeVectorStore
-    documents = SimpleDirectoryReader(wikipedia_data_dir).load_data()
-    wms_vector_index = VectorStoreIndex.from_documents(documents,
+    #documents = SimpleDirectoryReader(wikipedia_data_dir).load_data()
+    wms_vector_index = VectorStoreIndex.from_documents([],
                                        storage_context=storage_context)
 
 def train_query_engine_with_data():
