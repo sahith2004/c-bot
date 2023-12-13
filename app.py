@@ -76,10 +76,10 @@ llm = GradientBaseModelLLM(
     callback_manager=gradient_callback,
     is_chat_model=True,
 )
-folder_name = "data/wms"
+#folder_name = "data/wms"
 
 # Get the current directory
-current_directory = os.getcwd()
+#current_directory = os.getcwd()
 
 # Create a path for the new folder
 wikipedia_data_dir= folder_name
@@ -122,7 +122,7 @@ storage_context = StorageContext.from_defaults(vector_store=wms_vector_store)
 
 documents = SimpleDirectoryReader(wikipedia_data_dir).load_data()
 # allow the creation of an Index
-wms_vector_index = VectorStoreIndex.from_documents(documents,
+wms_vector_index = VectorStoreIndex.from_documents([],
                                        storage_context=storage_context)
 query_engine = wms_vector_index.as_query_engine()
 
